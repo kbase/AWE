@@ -141,7 +141,7 @@ func clientId(t string) string {
         req.Header.Add("X-Globus-Goauthtoken", t)
         if resp, err := client.Do(req); err == nil {
                 defer resp.Body.Close()
-                if resp.StatusCode == http.StatusCreated {
+                if resp.StatusCode == http.StatusCreated || resp.StatusCode == http.StatusOK {
                         if body, err := ioutil.ReadAll(resp.Body); err == nil {
                                 var dat map[string]interface{}
                                 if err = json.Unmarshal(body, &dat); err != nil {
