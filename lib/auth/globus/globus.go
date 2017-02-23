@@ -142,7 +142,7 @@ func clientId(t string) (clientId string, err error) {
         if err != nil {
                 err_str := "Error making request to " + conf.GLOBUS_TOKEN_URL + ": " + err.Error()
                 logger.Error(err_str)
-                return nil, errors.New(err_str)
+                return "", errors.New(err_str)
         }
         req.Header.Add("X-Globus-Goauthtoken", t)
         if resp, err := client.Do(req); err == nil {
@@ -153,7 +153,7 @@ func clientId(t string) (clientId string, err error) {
                                 if err = json.Unmarshal(body, &dat); err != nil {
                                         err_str := "Error parsing response from " + conf.GLOBUS_TOKEN_URL + ": " + err.Error()
                                         logger.Error(err_str)
-                                        return nil, errors.New(err_str)
+                                        return "", errors.New(err_str)
                                 } else {
                                         return dat["client_id"].(string), nil
                                 }
@@ -161,14 +161,14 @@ func clientId(t string) (clientId string, err error) {
                 } else {
                         err_str := "Unexpected response status responded from " + conf.GLOBUS_TOKEN_URL + ": " + resp.Status
                         logger.Error(err_str)
-                        return nil, errors.New(err_str)
+                        return "", errors.New(err_str)
                 }
         } else {
                 err_str := "Error responded from " + conf.GLOBUS_TOKEN_URL + " (" + resp.Status + "): " + err.Error()
                 logger.Error(err_str)
-                return nil, errors.New(err_str)
+                return "", errors.New(err_str)
         }
 
-        return nil, errors.New("Unknown error")
+        return "", errors.New("Unknown error")
 
 }
