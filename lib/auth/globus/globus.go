@@ -93,7 +93,8 @@ func fetchProfile(t string) (u *user.User, err error) {
 	client := &http.Client{
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 	}
-	req, err := http.NewRequest("GET", conf.GLOBUS_PROFILE_URL+"/"+clientId(t), nil)
+	clientIdRet := clientId(t)
+	req, err := http.NewRequest("GET", conf.GLOBUS_PROFILE_URL+"/"+clientIdRet, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +115,7 @@ func fetchProfile(t string) (u *user.User, err error) {
 		} else if resp.StatusCode == http.StatusForbidden {
 			return nil, errors.New(e.InvalidAuth)
 		} else {
-			err_str := "Authentication failed: Unexpected response status: " + resp.Status
+			err_str := "Authentication failed: Unexpected response status: " + resp.Status + ", url=" + conf.GLOBUS_PROFILE_URL+"/"+clientIdRet
 			logger.Error(err_str)
 			return nil, errors.New(err_str)
 		}
