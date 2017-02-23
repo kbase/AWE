@@ -93,7 +93,10 @@ func fetchProfile(t string) (u *user.User, err error) {
 	client := &http.Client{
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 	}
-	clientIdRet := clientId(t)
+	clientIdRet, err0 := clientId(t)
+    if err0 != nil {
+        return nil, err0
+    }
 	req, err := http.NewRequest("GET", conf.GLOBUS_PROFILE_URL+"/"+clientIdRet, nil)
 	if err != nil {
 		return nil, err
@@ -137,7 +140,9 @@ func clientId(t string) string {
         }
         req, err := http.NewRequest("GET", conf.GLOBUS_TOKEN_URL, nil)
         if err != nil {
-                return ""
+                err_str = "Error making request to " + conf.GLOBUS_TOKEN_URL + ": " + err
+                logger.Error(err_str)
+                return nil, errors.New(err_str)
         }
         req.Header.Add("X-Globus-Goauthtoken", t)
         if resp, err := client.Do(req); err == nil {
@@ -146,21 +151,24 @@ func clientId(t string) string {
                         if body, err := ioutil.ReadAll(resp.Body); err == nil {
                                 var dat map[string]interface{}
                                 if err = json.Unmarshal(body, &dat); err != nil {
-                                        return ""
+                                        err_str := "Error parsing response from " + conf.GLOBUS_TOKEN_URL + ": " + body
+                                        logger.Error(err_str)
+                                        return nil, errors.New(err_str)
                                 } else {
-                                        return dat["client_id"].(string)
+                                        return dat["client_id"].(string), nil
                                 }
                         }
-                } else if resp.StatusCode == http.StatusForbidden {
-                        return ""
                 } else {
-                        //err_str := "Authentication failed: Unexpected response status: " + resp.Status
-                        return ""
+                        err_str := "Unexpected response status responded from " + conf.GLOBUS_TOKEN_URL + ": " + resp.Status
+                        logger.Error(err_str)
+                        return nil, errors.New(err_str)
                 }
         } else {
-                return ""
+                err_str = "Error responded from " + conf.GLOBUS_TOKEN_URL + " (" + resp.Status + "): " + err
+                logger.Error(err_str)
+                return nil, errors.New(err_str)
         }
 
-        return ""
+        return nil, errors.New("Unknown error")
 
 }
