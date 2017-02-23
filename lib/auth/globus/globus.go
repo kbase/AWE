@@ -128,7 +128,7 @@ func fetchProfile(t string) (u *user.User, err error) {
 	return
 }
 
-func clientId(t string) string {
+func clientId(t string) (clientId string, err error) {
 	//for _, part := range strings.Split(t, "|") {
 	//	if kv := strings.Split(part, "="); kv[0] == "client_id" {
 	//		return kv[1]
@@ -140,7 +140,7 @@ func clientId(t string) string {
         }
         req, err := http.NewRequest("GET", conf.GLOBUS_TOKEN_URL, nil)
         if err != nil {
-                err_str = "Error making request to " + conf.GLOBUS_TOKEN_URL + ": " + err
+                err_str := "Error making request to " + conf.GLOBUS_TOKEN_URL + ": " + err.Error()
                 logger.Error(err_str)
                 return nil, errors.New(err_str)
         }
@@ -151,7 +151,7 @@ func clientId(t string) string {
                         if body, err := ioutil.ReadAll(resp.Body); err == nil {
                                 var dat map[string]interface{}
                                 if err = json.Unmarshal(body, &dat); err != nil {
-                                        err_str := "Error parsing response from " + conf.GLOBUS_TOKEN_URL + ": " + body
+                                        err_str := "Error parsing response from " + conf.GLOBUS_TOKEN_URL + ": " + err.Error()
                                         logger.Error(err_str)
                                         return nil, errors.New(err_str)
                                 } else {
@@ -164,7 +164,7 @@ func clientId(t string) string {
                         return nil, errors.New(err_str)
                 }
         } else {
-                err_str = "Error responded from " + conf.GLOBUS_TOKEN_URL + " (" + resp.Status + "): " + err
+                err_str := "Error responded from " + conf.GLOBUS_TOKEN_URL + " (" + resp.Status + "): " + err.Error()
                 logger.Error(err_str)
                 return nil, errors.New(err_str)
         }
