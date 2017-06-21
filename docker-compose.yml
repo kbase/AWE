@@ -1,0 +1,18 @@
+version: "3"
+services:
+  awe:
+    image: kbase/kb_awe
+    ports:
+      - "7107:7107"
+      - "7108:7108"
+      
+  mongoinit:
+    image: mongo:2
+    volumes:
+      - ./shock.mongodump:/mnt/shock.mongodump
+    entrypoint: [ "mongorestore", "--host", "mongo", "/mnt/shock.mongodump"]
+    depends_on: [ "mongo" ]
+  mongo:
+    image: mongo:2
+    ports:
+      - "27017:27017"
