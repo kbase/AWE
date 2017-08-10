@@ -10,7 +10,7 @@ DEST=`pwd`
 
 mkdir -p $GOPATH/src/github.com/MG-RAST && \
 go get github.com/pborman/uuid && \
-go get github.com/MG-RAST/golib && \
+go get github.com/MG-RAST/golib || \
 go get github.com/MG-RAST/go-dockerclient && \
 cd $GOPATH/src/github.com/MG-RAST && \
 git clone --recursive https://github.com/kbase/AWE && \
